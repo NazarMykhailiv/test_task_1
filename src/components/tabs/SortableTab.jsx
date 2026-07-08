@@ -48,13 +48,17 @@ export function SortableTab({
                 className={[
                     "tab",
                     isActive ? "active" : "",
+                    tab.pinned ? "pinned" : "",
                     isBeforeActive ? "before-active" : "",
                     isAfterActive ? "after-active" : "",
                 ].filter(Boolean).join(" ")}
                 type="button"
                 onClick={() => onOpen(tab.url)}
             >
-                {tab.label}
+                <span className="tab-icon" aria-hidden="true">
+                    {tab.icon}
+                </span>
+                <span className="tab-label">{tab.label}</span>
             </button>
 
             <div
