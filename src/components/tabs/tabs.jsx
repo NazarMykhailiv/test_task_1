@@ -11,130 +11,11 @@ import {
     SortableContext,
     arrayMove,
     horizontalListSortingStrategy,
-    useSortable,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./tabs.scss";
-
-const defaultTabs = [
-    { id: "dashboard", label: "Dashboard", url: "/dashboard", pinned: false },
-    { id: "banking", label: "Banking", url: "/banking", pinned: false },
-    { id: "telephone", label: "Telephone", url: "/telephone", pinned: false },
-    { id: "accounting", label: "Accounting", url: "/accounting", pinned: false },
-    { id: "verkauf", label: "Verkauf", url: "/verkout", pinned: false },
-    { id: "statistics", label: "Statistics", url: "/statistics", pinned: false },
-    { id: "administration", label: "Administration", url: "/administration", pinned: false },
-    { id: "post_office", label: "Post Office", url: "/post_office", pinned: false },
-    { id: "help", label: "Help", url: "/help", pinned: false },
-    { id: "warenbestand", label: "Warenbestand", url: "/warenbestand", pinned: false },
-    { id: "test", label: "Test", url: "/test", pinned: false },
-    { id: "reports", label: "Reports", url: "/reports", pinned: false },
-    { id: "orders", label: "Orders", url: "/orders", pinned: false },
-    { id: "customers", label: "Customers", url: "/customers", pinned: false },
-    { id: "settings", label: "Settings", url: "/settings", pinned: false },
-    { id: "calendar", label: "Calendar", url: "/calendar", pinned: false },
-    { id: "messages", label: "Messages", url: "/messages", pinned: false },
-    { id: "inventory", label: "Inventory", url: "/inventory", pinned: false },
-    { id: "analytics", label: "Analytics", url: "/analytics", pinned: false },
-    { id: "profile", label: "Profile", url: "/profile", pinned: false },
-    { id: "archive", label: "Archive", url: "/archive", pinned: false },
-    { id: "test1", label: "Test1", url: "/test1", pinned: false },
-    { id: "test2", label: "Test2", url: "/test2", pinned: false },
-];
-function getInitialTabs() {
-    const saved = localStorage.getItem("tabs");
-
-    if (!saved) return defaultTabs;
-
-    const savedTabs = JSON.parse(saved);
-    const uniqueSavedTabs = savedTabs.filter(
-        (tab, index, list) => list.findIndex((item) => item.id === tab.id) === index
-    );
-    const savedIds = new Set(uniqueSavedTabs.map((tab) => tab.id));
-    const newTabs = defaultTabs.filter((tab) => !savedIds.has(tab.id));
-
-    return [...uniqueSavedTabs, ...newTabs];
-}
-
-function groupPinnedTabs(tabs) {
-    return [
-        ...tabs.filter((tab) => tab.pinned),
-        ...tabs.filter((tab) => !tab.pinned),
-    ];
-}
-
-function SortableTab({
-    tab,
-    isActive,
-    isBeforeActive,
-    isAfterActive,
-    isPinVisible,
-    pinPopoverPosition,
-    onOpen,
-    onPin,
-    onShowPin,
-    onHidePin,
-}) {
-    const tabItemRef = useRef(null);
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: tab.id });
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    };
-
-    function setRefs(node) {
-        tabItemRef.current = node;
-        setNodeRef(node);
-    }
-
-    return (
-        <div
-            className={`tab-item ${isDragging ? "dragging" : ""}`}
-            ref={setRefs}
-            style={style}
-            onMouseEnter={() => onShowPin(tab.id, tabItemRef.current)}
-            onMouseLeave={onHidePin}
-            {...attributes}
-            {...listeners}
-        >
-            <button
-                className={[
-                    "tab",
-                    isActive ? "active" : "",
-                    isBeforeActive ? "before-active" : "",
-                    isAfterActive ? "after-active" : "",
-                ].filter(Boolean).join(" ")}
-                type="button"
-                onClick={() => onOpen(tab.url)}
-            >
-                {tab.label}
-            </button>
-
-            <div
-                className={`pin-popover ${isPinVisible ? "visible" : ""}`}
-                style={pinPopoverPosition ?? undefined}
-            >
-                <button
-                    className="pin-button"
-                    type="button"
-                    aria-label={tab.pinned ? `Unpin ${tab.label}` : `Pin ${tab.label}`}
-                    onClick={() => onPin(tab.id)}
-                >
-                    {tab.pinned ? "Unpin" : "Pin"}
-                </button>
-            </div>
-        </div>
-    );
-}
+import { SortableTab } from "./SortableTab";
+import { getInitialTabs, groupPinnedTabs } from "./Tabs.utils";
+import "./Tabs.scss";
 
 export function Tabs() {
     const navigate = useNavigate();
@@ -148,6 +29,7 @@ export function Tabs() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [visiblePinTabId, setVisiblePinTabId] = useState(null);
     const [pinPopoverPosition, setPinPopoverPosition] = useState(null);
+
     const sensors = useSensors(
         useSensor(MouseSensor, {
             activationConstraint: {
@@ -191,15 +73,13 @@ export function Tabs() {
                 return;
             }
 
-            const containerWidth = fullContainerWidth;
-
             let usedWidth = 0;
             let nextVisibleCount = tabs.length;
 
             for (let index = 0; index < measuredItems.length; index += 1) {
                 const itemWidth = measuredItems[index].offsetWidth;
 
-                if (usedWidth + itemWidth > containerWidth) {
+                if (usedWidth + itemWidth > fullContainerWidth) {
                     nextVisibleCount = index + 1;
                     break;
                 }

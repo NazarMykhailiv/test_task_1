@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
-import { Tabs } from './components/tabs/tabs.jsx'
+import { Tabs } from './components/tabs/Tabs.jsx'
 
 function App() {
   return (
