@@ -5,10 +5,14 @@ export function getInitialTabs() {
 
     if (!saved) return defaultTabs;
 
+    const defaultTabsById = new Map(defaultTabs.map((tab) => [tab.id, tab]));
     const savedTabs = JSON.parse(saved);
-    const uniqueSavedTabs = savedTabs.filter(
-        (tab, index, list) => list.findIndex((item) => item.id === tab.id) === index
-    );
+    const uniqueSavedTabs = savedTabs
+        .filter((tab, index, list) => list.findIndex((item) => item.id === tab.id) === index)
+        .map((tab) => ({
+            ...defaultTabsById.get(tab.id),
+            ...tab,
+        }));
     const savedIds = new Set(uniqueSavedTabs.map((tab) => tab.id));
     const newTabs = defaultTabs.filter((tab) => !savedIds.has(tab.id));
 

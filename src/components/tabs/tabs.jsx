@@ -26,6 +26,7 @@ export function Tabs() {
 
     const [tabs, setTabs] = useState(getInitialTabs);
     const [visibleCount, setVisibleCount] = useState(tabs.length);
+    const [hiddenStartIndex, setHiddenStartIndex] = useState(tabs.length);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [visiblePinTabId, setVisiblePinTabId] = useState(null);
     const [pinPopoverPosition, setPinPopoverPosition] = useState(null);
@@ -45,7 +46,7 @@ export function Tabs() {
     );
 
     const visibleTabs = tabs.slice(0, visibleCount);
-    const hiddenTabs = tabs.slice(visibleCount);
+    const hiddenTabs = tabs.slice(hiddenStartIndex);
 
     useEffect(() => {
         localStorage.setItem("tabs", JSON.stringify(tabs));
@@ -70,17 +71,20 @@ export function Tabs() {
 
             if (totalTabsWidth <= fullContainerWidth) {
                 setVisibleCount(tabs.length);
+                setHiddenStartIndex(tabs.length);
                 return;
             }
 
             let usedWidth = 0;
             let nextVisibleCount = tabs.length;
+            let nextHiddenStartIndex = tabs.length;
 
             for (let index = 0; index < measuredItems.length; index += 1) {
                 const itemWidth = measuredItems[index].offsetWidth;
 
                 if (usedWidth + itemWidth > fullContainerWidth) {
                     nextVisibleCount = index + 1;
+                    nextHiddenStartIndex = index;
                     break;
                 }
 
@@ -88,6 +92,7 @@ export function Tabs() {
             }
 
             setVisibleCount(nextVisibleCount);
+            setHiddenStartIndex(nextHiddenStartIndex);
         };
 
         const scheduleUpdate = () => {
@@ -142,11 +147,14 @@ export function Tabs() {
         if (tabElement) {
             const tabRect = tabElement.getBoundingClientRect();
             const viewportPadding = 8;
-            const right = Math.max(window.innerWidth - tabRect.right, viewportPadding);
+            const popoverWidth = 72;
+            const preferredLeft = tabRect.right - popoverWidth;
+            const maxLeft = window.innerWidth - popoverWidth - viewportPadding;
+            const left = Math.min(Math.max(preferredLeft, viewportPadding), maxLeft);
 
             setPinPopoverPosition({
                 top: tabRect.bottom,
-                right,
+                left,
             });
         }
 
@@ -233,7 +241,10 @@ export function Tabs() {
                                     key={tab.id}
                                     onClick={() => openTab(tab.url)}
                                 >
-                                    {tab.label}
+                                    <span className="tab-icon" aria-hidden="true">
+                                        {tab.icon}
+                                    </span>
+                                    <span>{tab.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -244,8 +255,11 @@ export function Tabs() {
             <div className="tabs-measure" ref={measureRef} aria-hidden="true">
                 {tabs.map((tab) => (
                     <div className="tab-item" key={tab.id}>
-                        <button className="tab" type="button">
-                            {tab.label}
+                        <button className={`tab ${tab.pinned ? "pinned" : ""}`} type="button">
+                            <span className="tab-icon" aria-hidden="true">
+                                {tab.icon}
+                            </span>
+                            <span className="tab-label">{tab.label}</span>
                         </button>
                     </div>
                 ))}
@@ -253,3 +267,4 @@ export function Tabs() {
         </div>
     );
 }
+

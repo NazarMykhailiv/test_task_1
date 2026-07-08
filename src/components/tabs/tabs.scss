@@ -9,7 +9,10 @@ $color-dragging: rgb(127, 133, 141);
 $color-divider: rgb(234, 238, 243);
 
 $tab-padding: 8px 12px;
+$pinned-tab-padding: 8px 10px;
+$tab-icon-size: 20px;
 $popover-radius: 4px;
+$pin-popover-width: 72px;
 $more-button-width: 36px;
 $top-border-width: 2px;
 $tab-divider-height: 18px;
@@ -52,6 +55,7 @@ $tab-divider-height: 18px;
         position: relative;
         display: flex;
         align-items: center;
+        gap: 8px;
         padding: $tab-padding;
         appearance: none;
         border: 0;
@@ -62,6 +66,17 @@ $tab-divider-height: 18px;
         white-space: nowrap;
         cursor: pointer;
         user-select: none;
+
+        &.pinned {
+            width: 40px;
+            justify-content: center;
+            gap: 0;
+            padding: $pinned-tab-padding;
+
+            .tab-label {
+                display: none;
+            }
+        }
 
         &::before,
         &::after {
@@ -108,9 +123,26 @@ $tab-divider-height: 18px;
         }
     }
 
+    .tab-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: $tab-icon-size;
+        height: $tab-icon-size;
+        flex: 0 0 $tab-icon-size;
+        border-radius: 6px;
+        background-color: $color-surface-hover;
+        color: $color-text;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+    }
+
     .pin-popover {
         position: fixed;
         z-index: 50;
+        width: $pin-popover-width;
+        box-sizing: border-box;
         padding: 2px;
         border-radius: $popover-radius;
         background-color: $color-surface;
@@ -138,6 +170,7 @@ $tab-divider-height: 18px;
     }
 
     .pin-button {
+        width: 100%;
         padding: 4px 6px;
         background: transparent;
         color: $color-text;
@@ -201,6 +234,9 @@ $tab-divider-height: 18px;
     }
 
     .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         padding: $tab-padding;
         background: transparent;
         color: $color-text;
