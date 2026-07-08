@@ -46,8 +46,11 @@ npm run build
 
 ## Main Files
 
-- `src/components/tabs/tabs.jsx` - tabs logic, routing, drag and drop, persistence, overflow calculation.
-- `src/components/tabs/tabs.scss` - tabs, dropdown, active state, pin popover, and drag styles.
+- `src/components/tabs/Tabs.jsx` - main tabs container, routing, state, persistence, overflow calculation, and drag/drop handlers.
+- `src/components/tabs/SortableTab.jsx` - single draggable tab component.
+- `src/components/tabs/Tabs.constants.js` - default tab data.
+- `src/components/tabs/Tabs.utils.js` - helpers for initial localStorage state and pinned tab grouping.
+- `src/components/tabs/Tabs.scss` - tabs, dropdown, active state, pin popover, dividers, and drag styles.
 - `src/App.jsx` - route definitions for tab URLs.
 
 ## Notes
@@ -55,3 +58,4 @@ npm run build
 The component stores tab order and pinned state in `localStorage` under the `tabs` key. If new default tabs are added later, they are merged into the saved list without losing the user's saved order.
 
 Pinned tabs follow browser-like behavior: they stay in a separate group before regular tabs, and reordering is allowed only inside the pinned or regular tab group.
+
